@@ -1,0 +1,2 @@
+// Minimal Capacitor settings.gradle for Termux build
+println("Capacitor settings loaded (minimal)")
