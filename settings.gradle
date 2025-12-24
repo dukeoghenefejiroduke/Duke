@@ -1,0 +1,4 @@
+rootProject.name = 'android'
+include ':app'
+// include ':capacitor-cordova-android-plugins'  <-- Disabled for Termux minimal build
+apply from: 'capacitor.settings.gradle'
