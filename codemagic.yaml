@@ -5,11 +5,13 @@ workflows:
     instance_type: mac_mini_m2
     environment:
       vars:
-        PACKAGE_NAME: 'com.example.myapp'  # Match your app ID exactly!
+        PACKAGE_NAME: 'com.example.jarvisai'  # Make sure this matches your app ID from cap init!
     scripts:
       - name: Install npm dependencies
-        script: npm install
-      - name: Add Android platform (creates android folder)
+        script: |
+          npm install
+          npm install @capacitor/android  # This installs the required Android platform package
+      - name: Add Android platform
         script: npx cap add android
       - name: Fix missing theme colors
         script: |
@@ -17,9 +19,9 @@ workflows:
           cat > android/app/src/main/res/values/colors.xml << EOF
           <?xml version="1.0" encoding="utf-8"?>
           <resources>
-              <color name="colorPrimary">#3F51B5</color>          <!-- Indigo 500 -->
-              <color name="colorPrimaryDark">#303F9F</color>      <!-- Indigo 700 -->
-              <color name="colorAccent">#FF4081</color>           <!-- Pink A200 -->
+              <color name="colorPrimary">#3F51B5</color>
+              <color name="colorPrimaryDark">#303F9F</color>
+              <color name="colorAccent">#FF4081</color>
           </resources>
           EOF
       - name: Sync Capacitor assets
