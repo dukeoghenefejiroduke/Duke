@@ -6,6 +6,9 @@ workflows:
     environment:
       node: latest
       npm: latest
+     android_sdk: latest 
+     java: 17   # Add this line
+  android_sdk: latest
     triggering:
       events:
         - push
