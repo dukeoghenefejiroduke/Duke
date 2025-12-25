@@ -1,73 +1,32 @@
 workflows:
-<<<<<<< HEAD
-  android-workflow:
-    name: Android Workflow
-    max_build_duration: 120
-    instance_type: mac_mini_m2
-    environment:
-      vars:
-        PACKAGE_NAME: 'com.example.jarvisai'  # Must exactly match your appId from capacitor.config.json!
-      java: 21  # This forces Java 21 for the entire build
-    scripts:
-      - name: Install npm dependencies
-        script: |
-          npm install
-          npm install @capacitor/android
-      - name: Add Android platform
-        script: npx cap add android
-      - name: Fix missing theme colors
-        script: |
-          mkdir -p android/app/src/main/res/values
-          cat > android/app/src/main/res/values/colors.xml << EOF
-          <?xml version="1.0" encoding="utf-8"?>
-          <resources>
-              <color name="colorPrimary">#3F51B5</color>
-              <color name="colorPrimaryDark">#303F9F</color>
-              <color name="colorAccent">#FF4081</color>
-          </resources>
-          EOF
-      - name: Sync Capacitor assets
-        script: npx cap sync
-      - name: Build Android debug
-        script: |
-          cd android
-          ./gradlew assembleDebug
-    artifacts:
-      - android/app/build/outputs/**/*.apk
-=======
   android:
     name: Build JARVIS Android APK
-    instance_type: mac_mini_m1
     max_build_duration: 120
+    instance_type: mac_mini_m1
     environment:
-      vars:
-        # Optional: Add your Gemini key securely later via Codemagic encrypted variables
       node: latest
       npm: latest
     triggering:
       events:
         - push
-        - tag
         - pull_request
     scripts:
       - name: Install dependencies
         script: |
-          npm install
+          npm ci
       - name: Build web assets
         script: |
           npm run build
       - name: Sync Capacitor
         script: |
           npx cap sync android
-      - name: Build Android APK
+      - name: Build Android Debug APK
         script: |
           cd android
-          ./gradlew assembleDebug --no-daemon
+          ./gradlew assembleDebug
     artifacts:
       - android/app/build/outputs/**/*.apk
-      - $HOME/.android/debug.keystore
     publishing:
       email:
         recipients:
-          - your-email@example.com  # Optional: Email APK to yourself
->>>>>>> a00c3e1 (Add Codemagic CI for APK build)
+          - dukeoghenefejiroduke@gmail.com   # Change to your email (optional)
