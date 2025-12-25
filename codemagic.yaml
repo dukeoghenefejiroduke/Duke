@@ -1,21 +1,34 @@
 workflows:
-  android-workflow:
-    name: Android Workflow
-    max_build_duration: 120
-    instance_type: mac_mini_m2
+  android-full-build:
+    name: Android Build (Debug + Release)
+    max_build_duration: 60
     environment:
-      vars:
-        PACKAGE_NAME: 'com.eg.myapp'
+      java: 17
+      flutter: none
     scripts:
-      - name: Install npm dependencies
-        script: npm install
-      - name: Add Android platform
-        script: npx cap add android
-      - name: Sync Capacitor assets
-        script: npx cap sync
-      - name: Build Android debug
+      - name: Install Node Modules
+        script: |
+          npm install
+
+      - name: Set version dynamically
+        script: |
+          VERSION_CODE=$(date +%s)
+          VERSION_NAME="1.0.$(date +%s)"
+          sed -i "s/versionCode .*/versionCode $VERSION_CODE/" android/app/build.gradle
+          sed -i "s/versionName \".*\"/versionName \"$VERSION_NAME\"/" android/app/build.gradle
+
+      - name: Grant gradlew execute
+        script: chmod +x android/gradlew
+
+      - name: Build Debug APK
         script: |
           cd android
           ./gradlew assembleDebug
+
+      - name: Build Release APK
+        script: |
+          cd android
+          ./gradlew assembleRelease
+
     artifacts:
       - android/app/build/outputs/**/*.apk
