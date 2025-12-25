@@ -1,4 +1,5 @@
 workflows:
+<<<<<<< HEAD
   android-workflow:
     name: Android Workflow
     max_build_duration: 120
@@ -33,3 +34,40 @@ workflows:
           ./gradlew assembleDebug
     artifacts:
       - android/app/build/outputs/**/*.apk
+=======
+  android:
+    name: Build JARVIS Android APK
+    instance_type: mac_mini_m1
+    max_build_duration: 120
+    environment:
+      vars:
+        # Optional: Add your Gemini key securely later via Codemagic encrypted variables
+      node: latest
+      npm: latest
+    triggering:
+      events:
+        - push
+        - tag
+        - pull_request
+    scripts:
+      - name: Install dependencies
+        script: |
+          npm install
+      - name: Build web assets
+        script: |
+          npm run build
+      - name: Sync Capacitor
+        script: |
+          npx cap sync android
+      - name: Build Android APK
+        script: |
+          cd android
+          ./gradlew assembleDebug --no-daemon
+    artifacts:
+      - android/app/build/outputs/**/*.apk
+      - $HOME/.android/debug.keystore
+    publishing:
+      email:
+        recipients:
+          - your-email@example.com  # Optional: Email APK to yourself
+>>>>>>> a00c3e1 (Add Codemagic CI for APK build)
