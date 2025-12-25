@@ -5,15 +5,16 @@ workflows:
     instance_type: mac_mini_m1
     environment:
       node: latest
-      npm: latest
-     android_sdk: latest 
-     java: 17   # Add this line
-  android_sdk: latest
+      java: 17
+      android_sdk: latest
     triggering:
       events:
         - push
         - pull_request
     scripts:
+      - name: Set up local.properties
+        script: |
+          echo "sdk.dir=$ANDROID_SDK_ROOT" > android/local.properties
       - name: Install dependencies
         script: |
           npm ci
@@ -23,7 +24,7 @@ workflows:
       - name: Sync Capacitor
         script: |
           npx cap sync android
-      - name: Build Android Debug APK
+      - name: Build Debug APK
         script: |
           cd android
           ./gradlew assembleDebug
@@ -32,4 +33,4 @@ workflows:
     publishing:
       email:
         recipients:
-          - dukeoghenefejiroduke@gmail.com   # Change to your email (optional)
+          - dukeoghenefejiroduke@gmail.com  # Replace with your email or remove line
