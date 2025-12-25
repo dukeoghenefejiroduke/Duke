@@ -5,7 +5,8 @@ workflows:
     instance_type: mac_mini_m2
     environment:
       vars:
-        PACKAGE_NAME: 'com.example.jarvisai'  # Must match your appId exactly!
+        PACKAGE_NAME: 'com.example.jarvisai'  # Must exactly match your appId from capacitor.config.json!
+      java: 21  # This forces Java 21 for the entire build
     scripts:
       - name: Install npm dependencies
         script: |
