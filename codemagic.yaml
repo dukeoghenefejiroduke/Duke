@@ -5,8 +5,7 @@ workflows:
     instance_type: mac_mini_m1
     environment:
       node: latest
-      java: 17
-      android_sdk: latest
+      java: 17  # Forces Java 17 to fix "invalid source release 21"
     triggering:
       events:
         - push
@@ -33,4 +32,4 @@ workflows:
     publishing:
       email:
         recipients:
-          - dukeoghenefejiroduke@gmail.com  # Replace with your email or remove line
+          - dukeoghenefejiroduke@gmail.com  # Replace or remove this line
