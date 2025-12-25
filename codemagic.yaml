@@ -5,12 +5,12 @@ workflows:
     instance_type: mac_mini_m2
     environment:
       vars:
-        PACKAGE_NAME: 'com.example.jarvisai'  # Make sure this matches your app ID from cap init!
+        PACKAGE_NAME: 'com.example.jarvisai'  # Must match your appId exactly!
     scripts:
       - name: Install npm dependencies
         script: |
           npm install
-          npm install @capacitor/android  # This installs the required Android platform package
+          npm install @capacitor/android
       - name: Add Android platform
         script: npx cap add android
       - name: Fix missing theme colors
