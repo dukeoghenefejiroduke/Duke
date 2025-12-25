@@ -1,6 +1,6 @@
 {
   "appId": "com.example.myapp",
   "appName": "eg",
-  "webDir": ".",
+  "webDir": "www",
   "bundledWebRuntime": false
 }
