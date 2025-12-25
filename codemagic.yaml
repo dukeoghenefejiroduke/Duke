@@ -5,12 +5,23 @@ workflows:
     instance_type: mac_mini_m2
     environment:
       vars:
-        PACKAGE_NAME: 'com.example.myapp'
+        PACKAGE_NAME: 'com.example.myapp'  # Match your app ID exactly!
     scripts:
       - name: Install npm dependencies
         script: npm install
-      - name: Add Android platform
+      - name: Add Android platform (creates android folder)
         script: npx cap add android
+      - name: Fix missing theme colors
+        script: |
+          mkdir -p android/app/src/main/res/values
+          cat > android/app/src/main/res/values/colors.xml << EOF
+          <?xml version="1.0" encoding="utf-8"?>
+          <resources>
+              <color name="colorPrimary">#3F51B5</color>          <!-- Indigo 500 -->
+              <color name="colorPrimaryDark">#303F9F</color>      <!-- Indigo 700 -->
+              <color name="colorAccent">#FF4081</color>           <!-- Pink A200 -->
+          </resources>
+          EOF
       - name: Sync Capacitor assets
         script: npx cap sync
       - name: Build Android debug
