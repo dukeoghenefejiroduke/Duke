@@ -1,3 +1,5 @@
+apply plugin: 'com.android.application'
+
 android {
     namespace "com.duke.jarvis"
     compileSdk 34
@@ -32,4 +34,12 @@ android {
             excludes += '/META-INF/{AL2.0,LGPL2.1}'
         }
     }
+}
+
+dependencies {
+    implementation project(':capacitor-android')
+    implementation project(':capacitor-cordova-android-plugins')
+    testImplementation 'junit:junit:4.13.2'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
 }
