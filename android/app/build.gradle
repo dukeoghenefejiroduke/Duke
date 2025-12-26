@@ -1,11 +1,11 @@
 android {
     namespace "com.duke.jarvis"
-    compileSdk 36  # Changed from 34
+    compileSdk 36
 
     defaultConfig {
         applicationId "com.duke.jarvis"
         minSdk 21
-        targetSdk 36  # Also update to 36
+        targetSdk 36
         versionCode 1
         versionName "1.0"
     }
