@@ -4,7 +4,6 @@ import { TextToSpeech } from '@capacitor-community/text-to-speech';
 import { Camera } from '@capacitor/camera';
 import { Geolocation } from '@capacitor/geolocation';
 import { Contacts } from '@capacitor-community/contacts';
-import { Preferences } from '@capacitor/preferences';
 import { Media } from '@capacitor-community/media';
 import { BluetoothLe } from '@capacitor-community/bluetooth-le';
 import { App } from '@capacitor/app';
@@ -15,12 +14,13 @@ import './App.css';
 function App() {
   const [status, setStatus] = useState('Initializing JARVIS...');
 
-  const GEMINI_API_KEY = 'AIzaSyBKQ07Jd8dNw-cfwQ_JQDL15TrjBx6RHeE';
+  // Replace with your own Gemini API key (free from https://ai.google.dev)
+  const GEMINI_API_KEY = 'YOUR_GEMINI_API_KEY_HERE';
   const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
-  const model = genAI.getGenerativeModel({ 
+  const model = genAI.getGenerativeModel({
     model: 'gemini-1.5-flash',
     systemInstruction: `You are JARVIS, Tony Stark's highly intelligent, sarcastic, dry-witted British AI assistant from Iron Man. 
-    Respond concisely, with subtle superiority and humor. Use "sir" occasionally. Be extremely helpful.`
+Respond concisely, with subtle superiority and humor. Use "sir" occasionally. Be extremely helpful.`,
   });
 
   useEffect(() => {
@@ -44,14 +44,14 @@ function App() {
 
         SpeechRecognition.addListener('partialResults', async (event) => {
           const transcript = event.value?.[0]?.toLowerCase() || '';
-          
+
           if (transcript.includes('jarvis')) {
             const query = transcript.replace(/jarvis/gi, '').trim();
 
-            let responseText = "";
+            let responseText = '';
 
             if (!query) {
-              responseText = "Yes, sir?";
+              responseText = 'Yes, sir?';
             } else if (query.includes('time')) {
               responseText = `The current time is ${new Date().toLocaleTimeString('en-GB')}, sir.`;
             } else if (query.includes('date')) {
@@ -61,7 +61,7 @@ function App() {
                 const pos = await Geolocation.getCurrentPosition();
                 responseText = `You are at latitude ${pos.coords.latitude.toFixed(4)}, longitude ${pos.coords.longitude.toFixed(4)}. Try not to get lost again, sir.`;
               } catch {
-                responseText = "Location access denied, sir.";
+                responseText = 'Location access denied, sir.';
               }
             } else if (query.includes('call') || query.includes('phone') || query.includes('dial')) {
               const name = query.replace(/call|phone|dial|ring/gi, '').trim();
@@ -72,22 +72,22 @@ function App() {
               return;
             } else if (query.includes('play music') || query.includes('play')) {
               await Media.play();
-              responseText = "Playing music, sir.";
+              responseText = 'Playing music, sir.';
             } else if (query.includes('pause')) {
               await Media.pause();
-              responseText = "Music paused.";
+              responseText = 'Music paused.';
             } else if (query.includes('next')) {
               await Media.next();
-              responseText = "Next track.";
+              responseText = 'Next track.';
             } else if (query.includes('bluetooth')) {
               const enabled = await BluetoothLe.isEnabled();
-              responseText = enabled ? "Bluetooth is on, sir." : "Bluetooth is off, sir.";
+              responseText = enabled ? 'Bluetooth is on, sir.' : 'Bluetooth is off, sir.';
             } else {
               try {
                 const result = await model.generateContent(query);
                 responseText = result.response.text();
               } catch (e) {
-                responseText = "I'm having trouble connecting to my higher functions, sir. Check your internet.";
+                responseText = 'I\'m having trouble connecting to my higher functions, sir. Check your internet.';
               }
             }
 
@@ -95,7 +95,6 @@ function App() {
             setStatus(responseText);
           }
         });
-
       } catch (error) {
         setStatus('Error: ' + error.message);
       }
@@ -103,6 +102,7 @@ function App() {
 
     initJarvis();
 
+    // Holographic particles background
     if (window.particlesJS) {
       window.particlesJS('particles-js', {
         particles: {
@@ -112,11 +112,11 @@ function App() {
           opacity: { value: 0.6 },
           size: { value: 3 },
           line_linked: { enable: true, distance: 120, color: '#00d8ff', opacity: 0.4 },
-          move: { enable: true, speed: 2 }
+          move: { enable: true, speed: 2 },
         },
         interactivity: {
-          events: { onhover: { enable: true, mode: 'repulse' } }
-        }
+          events: { onhover: { enable: true, mode: 'repulse' } },
+        },
       });
     }
 
@@ -131,7 +131,7 @@ function App() {
       lang: 'en-GB',
       rate: 0.95,
       pitch: 1.0,
-      volume: 1.0
+      volume: 1.0,
     });
   };
 
@@ -141,7 +141,7 @@ function App() {
       if (perm.contacts !== 'granted') await Contacts.requestPermissions();
 
       const result = await Contacts.getContacts();
-      const contact = result.contacts.find(c => c.name?.display?.toLowerCase().includes(name.toLowerCase()));
+      const contact = result.contacts.find((c) => c.name?.display?.toLowerCase().includes(name.toLowerCase()));
 
       if (contact?.phoneNumbers?.[0]) {
         window.location.href = `tel:${contact.phoneNumbers[0].number}`;
@@ -150,7 +150,7 @@ function App() {
         await speak(`No contact found for "${name}", sir.`);
       }
     } catch {
-      await speak(`Cannot access contacts, sir.`);
+      await speak('Cannot access contacts, sir.');
     }
   };
 
@@ -159,33 +159,33 @@ function App() {
       const photo = await Camera.getPhoto({
         quality: 90,
         allowEditing: false,
-        resultType: 'base64'
+        resultType: 'base64',
       });
 
-      await speak("Analyzing image, sir...");
+      await speak('Analyzing image, sir...');
 
       const result = await model.generateContent([
         "Describe this image in JARVIS's sarcastic, witty style.",
-        { inlineData: { data: photo.base64, mimeType: 'image/jpeg' } }
+        { inlineData: { data: photo.base64, mimeType: 'image/jpeg' } },
       ]);
 
       const description = result.response.text();
       await speak(description);
       setStatus(description);
     } catch {
-      await speak("Camera failed, sir.");
+      await speak('Camera failed, sir.');
     }
   };
 
   return (
     <div className="jarvis-container">
       <div id="particles-js"></div>
-      
+
       <div className="jarvis-ui">
         <h1>JARVIS</h1>
         <p className="status">{status}</p>
         <div className="hint">
-          Say: "Jarvis" + command<br/>
+          Say: "Jarvis" + command<br />
           Try: time, location, call Mom, take photo, play music, bluetooth
         </div>
       </div>
