@@ -1,30 +1,26 @@
 // src/services/wakeword.js
-import { PorcupineWorkerFactory } from "@picovoice/porcupine-web";
+import PorcupineWorker from "@picovoice/porcupine-web/dist/porcupine-web-worker.js";
 
 let porcupineWorker = null;
 
 export const initWakeWord = async (onWakeWordDetected) => {
   if (porcupineWorker) return;
 
-  // Initialize Porcupine Web with a keyword (Jarvis)
-  porcupineWorker = await PorcupineWorkerFactory.create(
-    {
-      keywords: ["jarvis"],  // You can add more keywords if desired
-      sensitivity: [0.7],
-    },
-    (keywordIndex) => {
-      // Trigger callback when wake word detected
+  porcupineWorker = new PorcupineWorker({
+    keywords: ["jarvis"],
+    sensitivities: [0.7],
+    onKeywordDetected: (keywordIndex) => {
       onWakeWordDetected();
-    }
-  );
+    },
+  });
+
+  // Start microphone capture
+  await porcupineWorker.start();
 };
 
-export const processAudioFrame = (pcmFrame) => {
-  if (porcupineWorker) porcupineWorker.postMessage(pcmFrame);
-};
-
-export const stopWakeWord = () => {
+export const stopWakeWord = async () => {
   if (porcupineWorker) {
+    await porcupineWorker.stop();
     porcupineWorker.terminate();
     porcupineWorker = null;
   }
