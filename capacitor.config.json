@@ -1,12 +1,17 @@
 {
-<<<<<<< HEAD
-  "appId": "com.example.myapp",
-  "appName": "eg",
-  "webDir": "www",
-=======
   "appId": "com.duke.jarvis",
   "appName": "JARVIS AI",
   "webDir": "dist",
->>>>>>> a00c3e1 (Add Codemagic CI for APK build)
-  "bundledWebRuntime": false
+  "bundledWebRuntime": false,
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 2000
+    }
+  },
+  "android": {
+    "icon": "./resources/icon.png"
+  },
+  "ios": {
+    "icon": "./resources/icon.png"
+  }
 }
