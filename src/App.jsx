@@ -1,10 +1,13 @@
 import { useEffect, useState } from 'react';
-import { SpeechRecognition } from '@capgo/capacitor-speech-recognition';
+import { SpeechRecognition } from '@capacitor-community/speech-recognition';
 import { TextToSpeech } from '@capacitor-community/text-to-speech';
 import { Camera } from '@capacitor/camera';
 import { Geolocation } from '@capacitor/geolocation';
 import { Contacts } from '@capacitor-community/contacts';
 import { Preferences } from '@capacitor/preferences';
+import { Media } from '@capacitor-community/media';
+import { BluetoothLe } from '@capacitor-community/bluetooth-le';
+import { App } from '@capacitor/app';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
 import './App.css';
@@ -23,30 +26,33 @@ function App() {
   useEffect(() => {
     const initJarvis = async () => {
       try {
-        // Startup (no vibration – removed for Android 9 compatibility)
         setStatus('JARVIS online. Listening for wake word...');
 
         await SpeechRecognition.requestPermissions();
 
-        await SpeechRecognition.startListening({
+        await SpeechRecognition.start({
           language: 'en-US',
           partialResults: true,
-          maxResults: 10,
+        });
+
+        // Keep listening when app is active
+        App.addListener('appStateChange', ({ isActive }) => {
+          if (isActive) {
+            SpeechRecognition.start({ language: 'en-US', partialResults: true });
+          }
         });
 
         SpeechRecognition.addListener('partialResults', async (event) => {
-          const transcript = event.matches?.[0]?.toLowerCase() || '';
+          const transcript = event.value?.[0]?.toLowerCase() || '';
           
           if (transcript.includes('jarvis')) {
-            // Wake word detected (no vibration – removed)
-            
             const query = transcript.replace(/jarvis/gi, '').trim();
-
-            let userMessage = query || "Yes, sir?";
 
             let responseText = "";
 
-            if (query.includes('time')) {
+            if (!query) {
+              responseText = "Yes, sir?";
+            } else if (query.includes('time')) {
               responseText = `The current time is ${new Date().toLocaleTimeString('en-GB')}, sir.`;
             } else if (query.includes('date')) {
               responseText = `Today is ${new Date().toLocaleDateString('en-GB', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}.`;
@@ -64,12 +70,24 @@ function App() {
             } else if (query.includes('photo') || query.includes('picture') || query.includes('camera')) {
               await takeAndAnalyzePhoto();
               return;
+            } else if (query.includes('play music') || query.includes('play')) {
+              await Media.play();
+              responseText = "Playing music, sir.";
+            } else if (query.includes('pause')) {
+              await Media.pause();
+              responseText = "Music paused.";
+            } else if (query.includes('next')) {
+              await Media.next();
+              responseText = "Next track.";
+            } else if (query.includes('bluetooth')) {
+              const enabled = await BluetoothLe.isEnabled();
+              responseText = enabled ? "Bluetooth is on, sir." : "Bluetooth is off, sir.";
             } else {
               try {
-                const result = await model.generateContent(userMessage);
+                const result = await model.generateContent(query);
                 responseText = result.response.text();
               } catch (e) {
-                responseText = "I'm having trouble connecting to my higher functions, sir. Please check your internet.";
+                responseText = "I'm having trouble connecting to my higher functions, sir. Check your internet.";
               }
             }
 
@@ -79,7 +97,7 @@ function App() {
         });
 
       } catch (error) {
-        setStatus('Error initializing JARVIS: ' + error.message);
+        setStatus('Error: ' + error.message);
       }
     };
 
@@ -91,9 +109,9 @@ function App() {
           number: { value: 100 },
           color: { value: '#00d8ff' },
           shape: { type: 'circle' },
-          opacity: { value: 0.6, random: true },
+          opacity: { value: 0.6 },
           size: { value: 3 },
-          line_linked: { enable: true, distance: 120, color: '#00d8ff', opacity: 0.4, width: 1 },
+          line_linked: { enable: true, distance: 120, color: '#00d8ff', opacity: 0.4 },
           move: { enable: true, speed: 2 }
         },
         interactivity: {
@@ -102,7 +120,9 @@ function App() {
       });
     }
 
-    return () => SpeechRecognition.stopListening();
+    return () => {
+      SpeechRecognition.stop();
+    };
   }, []);
 
   const speak = async (text) => {
@@ -121,9 +141,7 @@ function App() {
       if (perm.contacts !== 'granted') await Contacts.requestPermissions();
 
       const result = await Contacts.getContacts();
-      const contact = result.contacts.find(c => 
-        c.name?.display?.toLowerCase().includes(name.toLowerCase())
-      );
+      const contact = result.contacts.find(c => c.name?.display?.toLowerCase().includes(name.toLowerCase()));
 
       if (contact?.phoneNumbers?.[0]) {
         window.location.href = `tel:${contact.phoneNumbers[0].number}`;
@@ -154,8 +172,8 @@ function App() {
       const description = result.response.text();
       await speak(description);
       setStatus(description);
-    } catch (e) {
-      await speak("Camera failed or access denied, sir.");
+    } catch {
+      await speak("Camera failed, sir.");
     }
   };
 
@@ -167,8 +185,8 @@ function App() {
         <h1>JARVIS</h1>
         <p className="status">{status}</p>
         <div className="hint">
-          Say: "Jarvis" + your command<br/>
-          Examples: time, location, call Mom, take photo, or anything!
+          Say: "Jarvis" + command<br/>
+          Try: time, location, call Mom, take photo, play music, bluetooth
         </div>
       </div>
     </div>
