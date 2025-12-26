@@ -1,13 +1,31 @@
+// src/App.jsx
 import { useEffect, useState } from "react";
-import { brain } from "./core/brain";
+import { initWakeWord } from "./services/wakeword";
+import { initSpeech, startListening } from "./services/speech";
+import { processCommand } from "./core/brain";
 import HUD from "./ui/hud";
 
-export default function App() {
-  const [status, setStatus] = useState("JARVIS initializing...");
+function App() {
+  const [status, setStatus] = useState("Initializing JARVIS...");
 
   useEffect(() => {
-    brain.init(setStatus);
+    const initJarvis = async () => {
+      setStatus("JARVIS online. Listening for wake word...");
+      await initSpeech();
+      await initWakeWord(async () => {
+        setStatus("Wake word detected. Listening...");
+        startListening(async (transcript) => {
+          setStatus(`Heard: ${transcript}`);
+          await processCommand(transcript);
+        });
+      });
+    };
+    initJarvis();
+
+    return () => {};
   }, []);
 
   return <HUD status={status} />;
 }
+
+export default App;

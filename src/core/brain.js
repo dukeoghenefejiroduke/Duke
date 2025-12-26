@@ -1,97 +1,50 @@
-import { startListening, speak } from "../services/speech";
-import { detectIntent } from "./intent";
-import { personality } from "./personality";
-import { remember, recall } from "./memory";
+// src/core/brain.js
+import { speak } from "../services/speech";
 import { askAI } from "../services/ai";
-import { getSystemStatus } from "../services/system";
-import { startWakeWord } from "../services/wakeword";
+import {
+  takePhoto,
+  getLocation,
+  callContact,
+  controlMedia,
+  checkBluetooth,
+} from "../services/system";
 
-// Optional: add more services as needed
-import { takePhoto } from "../services/camera";
-import { callContact } from "../services/contacts";
+export const processCommand = async (command) => {
+  const query = command.toLowerCase().replace(/jarvis/gi, "").trim();
+  if (!query) return speak("Yes, sir?");
 
-export const brain = {
-  mood: "sarcastic",
-  listening: false,
+  if (query.includes("time")) return speak(`The current time is ${new Date().toLocaleTimeString("en-GB")}, sir.`);
+  if (query.includes("date")) return speak(`Today is ${new Date().toLocaleDateString("en-GB", { weekday: "long", year: "numeric", month: "long", day: "numeric" })}.`);
+  if (query.includes("location") || query.includes("where am i")) {
+    const coords = await getLocation();
+    return speak(coords ? `You are at latitude ${coords.latitude.toFixed(4)}, longitude ${coords.longitude.toFixed(4)}. Try not to get lost again, sir.` : "Location access denied, sir.");
+  }
+  if (query.includes("call") || query.includes("phone") || query.includes("dial")) {
+    const name = query.replace(/call|phone|dial|ring/gi, "").trim();
+    const result = await callContact(name);
+    return speak(result);
+  }
+  if (query.includes("photo") || query.includes("picture") || query.includes("camera")) {
+    const photo = await takePhoto();
+    if (photo) {
+      const description = await askAI([
+        "Describe this image in JARVIS's sarcastic style.",
+        { inlineData: { data: photo, mimeType: "image/jpeg" } },
+      ]);
+      return speak(description);
+    } else return speak("Camera failed, sir.");
+  }
+  if (query.includes("play") || query.includes("pause") || query.includes("next")) {
+    const action = query.includes("play") ? "play" : query.includes("pause") ? "pause" : "next";
+    const result = await controlMedia(action);
+    return speak(result);
+  }
+  if (query.includes("bluetooth")) {
+    const status = await checkBluetooth();
+    return speak(status);
+  }
 
-  async init(onUpdateStatus) {
-    // Start offline wake word
-    startWakeWord(() => {
-      onUpdateStatus("Wake word detected. Listening...");
-      this.startListening(onUpdateStatus);
-    });
-
-    // Start general speech recognition
-    this.startListening(onUpdateStatus);
-  },
-
-  async startListening(onUpdateStatus) {
-    if (this.listening) return;
-    this.listening = true;
-
-    startListening(async (text) => {
-      if (!text.toLowerCase().includes("jarvis")) return;
-
-      const command = text.replace(/jarvis/gi, "").trim();
-      if (!command) {
-        await speak("Yes, sir?");
-        onUpdateStatus("Yes, sir?");
-        return;
-      }
-
-      // Remember command
-      await remember("lastCommand", command);
-
-      // Detect intent
-      const intent = detectIntent(command);
-
-      let response = "";
-      try {
-        switch (intent) {
-          case "TIME":
-            response = new Date().toLocaleTimeString();
-            break;
-          case "DATE":
-            response = new Date().toDateString();
-            break;
-          case "BATTERY":
-          case "SYSTEM":
-            response = await getSystemStatus();
-            break;
-          case "LOCATION":
-            // Example: could use Geolocation here
-            response = "You are somewhere on Earth, sir. 😉";
-            break;
-          case "CAMERA":
-            response = await takePhoto();
-            break;
-          case "CALL":
-            await callContact(command);
-            return;
-          default:
-            response = await askAI(command);
-        }
-
-        // Apply personality
-        response = personality(response, this.mood);
-
-        // Speak and update UI
-        await speak(response);
-        onUpdateStatus(response);
-
-      } catch (err) {
-        console.error("Brain error:", err);
-        await speak("I encountered a problem, sir.");
-        onUpdateStatus("Error in brain.js");
-      }
-    });
-  },
-
-  async setMood(newMood) {
-    this.mood = newMood;
-  },
-
-  async recallMemory(key) {
-    return await recall(key);
-  },
+  // Default AI response
+  const response = await askAI(query);
+  return speak(response);
 };

@@ -1,23 +1,29 @@
-import { SpeechRecognition } from '@capacitor-community/speech-recognition';
-import { TextToSpeech } from '@capacitor-community/text-to-speech';
+// src/services/speech.js
+import { SpeechRecognition } from "@capacitor-community/speech-recognition";
+import { TextToSpeech } from "@capacitor-community/text-to-speech";
 
-export async function startListening(callback) {
-  await SpeechRecognition.start({
-    language: 'en-US',
-    partialResults: true,
+export const initSpeech = async () => {
+  await SpeechRecognition.requestPermissions();
+};
+
+export const startListening = (onResult) => {
+  SpeechRecognition.start({ language: "en-US", partialResults: true });
+  SpeechRecognition.addListener("partialResults", (event) => {
+    const transcript = event.value?.[0] || "";
+    onResult(transcript);
   });
+};
 
-  SpeechRecognition.addListener('partialResults', e => {
-    const text = e.value?.[0];
-    if (text) callback(text);
-  });
-}
+export const stopListening = async () => {
+  await SpeechRecognition.stop();
+};
 
-export async function speak(text) {
-  await TextToSpeech.stop();
+export const speak = async (text) => {
   await TextToSpeech.speak({
     text,
-    lang: 'en-GB',
+    lang: "en-GB",
     rate: 0.95,
+    pitch: 1.0,
+    volume: 1.0,
   });
-}
+};
