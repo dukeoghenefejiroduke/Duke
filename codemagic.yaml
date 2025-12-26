@@ -1,22 +1,26 @@
 workflows:
-  android:
+  android-workflow:
     name: Build JARVIS Android APK
     max_build_duration: 120
-    instance_type: mac_mini_m1
+    instance_type: mac_mini_m2
     environment:
-      node: latest
-      java: 17  # Forces Java 17 to fix "invalid source release 21"
-    triggering:
-      events:
-        - push
-        - pull_request
+      java: 21  # Critical: Capacitor 8 needs Java 21
     scripts:
-      - name: Set up local.properties
-        script: |
-          echo "sdk.dir=$ANDROID_SDK_ROOT" > android/local.properties
       - name: Install dependencies
         script: |
           npm ci
+          npm install @capacitor/android
+      - name: Re-add Android platform (fixes root build.gradle)
+        script: |
+          npx cap add android
+      - name: Fix missing theme colors (harmless)
+        script: |
+          mkdir -p android/app/src/main/res/values
+          echo '<?xml version="1.0" encoding="utf-8"?>
+          <resources>
+              <color name="colorPrimary">#00BFFF</color>
+              <color name="colorPrimaryDark">#0088CC</color>
+          </resources>' > android/app/src/main/res/values/colors.xml
       - name: Build web assets
         script: |
           npm run build
@@ -29,7 +33,3 @@ workflows:
           ./gradlew assembleDebug
     artifacts:
       - android/app/build/outputs/**/*.apk
-    publishing:
-      email:
-        recipients:
-          - dukeoghenefejiroduke@gmail.com  # Replace or remove this line
