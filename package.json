@@ -19,13 +19,15 @@
     "@capacitor/background-runner": "^3.0.0",
     "@capacitor/camera": "^8.0.0",
     "@capacitor/core": "^8.0.0",
+    "@capacitor/device": "^8.0.0",
     "@capacitor/geolocation": "^8.0.0",
     "@capacitor/haptics": "^8.0.0",
     "@capacitor/preferences": "^8.0.0",
     "@google/generative-ai": "^0.17.0",
-    "particles.js": "^2.0.0",
+    "@picovoice/porcupine-react-native": "^4.0.0",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "tsparticles": "^3.9.1"
   },
   "devDependencies": {
     "@capacitor/android": "^8.0.0",
