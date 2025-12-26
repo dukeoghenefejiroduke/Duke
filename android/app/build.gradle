@@ -1,6 +1,8 @@
+apply plugin: 'com.android.application'
+
 android {
     namespace "com.duke.jarvis"
-    compileSdk 34  // <-- This line must be here (or compileSdkVersion 34)
+    compileSdk 34
 
     defaultConfig {
         applicationId "com.duke.jarvis"
@@ -8,8 +10,6 @@ android {
         targetSdk 34
         versionCode 1
         versionName "1.0"
-
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
     compileOptions {
@@ -24,7 +24,11 @@ android {
     buildTypes {
         release {
             minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+}
+
+dependencies {
+    implementation project(':capacitor-android')
+    implementation project(':capacitor-cordova-android-plugins')
 }
