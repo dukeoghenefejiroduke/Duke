@@ -4,17 +4,14 @@ import { TextToSpeech } from '@capacitor-community/text-to-speech';
 import { Camera } from '@capacitor/camera';
 import { Geolocation } from '@capacitor/geolocation';
 import { Contacts } from '@capacitor-community/contacts';
-import { Haptics } from '@capacitor/haptics';
 import { Preferences } from '@capacitor/preferences';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
-// Import particles after install
 import './App.css';
 
 function App() {
   const [status, setStatus] = useState('Initializing JARVIS...');
 
-  // === YOUR GEMINI API KEY HERE (get free at https://ai.google.dev) ===
   const GEMINI_API_KEY = 'AIzaSyBKQ07Jd8dNw-cfwQ_JQDL15TrjBx6RHeE';
   const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
   const model = genAI.getGenerativeModel({ 
@@ -26,26 +23,22 @@ function App() {
   useEffect(() => {
     const initJarvis = async () => {
       try {
-        // Startup feedback
-        await Haptics.vibrate();
+        // Startup (no vibration – removed for Android 9 compatibility)
         setStatus('JARVIS online. Listening for wake word...');
 
-        // Request permissions
         await SpeechRecognition.requestPermissions();
 
-        // Start continuous listening
         await SpeechRecognition.startListening({
           language: 'en-US',
           partialResults: true,
           maxResults: 10,
         });
 
-        // Wake word listener
         SpeechRecognition.addListener('partialResults', async (event) => {
           const transcript = event.matches?.[0]?.toLowerCase() || '';
           
           if (transcript.includes('jarvis')) {
-            await Haptics.impact({ style: 'heavy' });
+            // Wake word detected (no vibration – removed)
             
             const query = transcript.replace(/jarvis/gi, '').trim();
 
@@ -53,7 +46,6 @@ function App() {
 
             let responseText = "";
 
-            // Built-in commands (fast, no internet needed)
             if (query.includes('time')) {
               responseText = `The current time is ${new Date().toLocaleTimeString('en-GB')}, sir.`;
             } else if (query.includes('date')) {
@@ -73,7 +65,6 @@ function App() {
               await takeAndAnalyzePhoto();
               return;
             } else {
-              // Full Gemini AI response
               try {
                 const result = await model.generateContent(userMessage);
                 responseText = result.response.text();
@@ -94,7 +85,6 @@ function App() {
 
     initJarvis();
 
-    // Initialize particles background
     if (window.particlesJS) {
       window.particlesJS('particles-js', {
         particles: {
