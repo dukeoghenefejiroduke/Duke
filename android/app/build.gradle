@@ -1,3 +1,5 @@
+apply plugin: 'com.android.application'
+
 android {
     namespace "com.duke.jarvis"
     compileSdk 36
@@ -20,4 +22,10 @@ android {
             minifyEnabled false
         }
     }
+}
+
+dependencies {
+    // Your dependencies here (add if missing)
+    implementation project(':capacitor-android')
+    implementation project(':capacitor-cordova-android-plugins')
 }
