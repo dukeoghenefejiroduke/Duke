@@ -1,8 +1,23 @@
+// src/ui/hud.jsx
+import { useEffect } from "react";
+import "tsparticles";
+
 export default function HUD({ status }) {
+  useEffect(() => {
+    if (window.tsParticles) {
+      window.tsParticles.load("particles-js", {
+        particles: { number: { value: 80 }, color: { value: "#00d8ff" }, move: { enable: true } },
+      });
+    }
+  }, []);
+
   return (
-    <div className="hud">
-      <h1>J.A.R.V.I.S</h1>
-      <p>{status}</p>
+    <div className="jarvis-container">
+      <div id="particles-js"></div>
+      <div className="jarvis-ui">
+        <h1>JARVIS</h1>
+        <p className="status">{status}</p>
+      </div>
     </div>
   );
 }
