@@ -1,0 +1,87 @@
+{
+  "name": "@capacitor/background-runner",
+  "version": "3.0.0",
+  "description": "Capacitor Background Runner",
+  "main": "dist/plugin.cjs.js",
+  "module": "dist/esm/index.js",
+  "license": "MIT",
+  "types": "dist/esm/index.d.ts",
+  "unpkg": "dist/plugin.js",
+  "files": [
+    "android/src/main/",
+    "android/build.gradle",
+    "dist/",
+    "ios/Sources",
+    "ios/Tests",
+    "Package.swift",
+    "scripts/install_libs.js",
+    "CapacitorBackgroundRunner.podspec"
+  ],
+  "author": "Ionic Team",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ionic-team/capacitor-background-runner.git"
+  },
+  "bugs": {
+    "url": "https://ionic.io/issues"
+  },
+  "keywords": [
+    "capacitor",
+    "plugin",
+    "native"
+  ],
+  "scripts": {
+    "verify": "npm run verify:ios && npm run verify:android && npm run verify:web",
+    "verify:ios": "xcodebuild -scheme CapacitorBackgroundRunner -destination generic/platform=iOS && xcodebuild test -scheme CapacitorBackgroundRunner -destination 'platform=iOS Simulator,OS=18.6,name=iPhone 16 Pro'",
+    "verify:android": "cd android && ./gradlew clean build test && cd ..",
+    "verify:web": "npm run build",
+    "lint": "npm run eslint && npm run prettier -- --check && npm run swiftlint -- lint",
+    "fmt": "npm run eslint -- --fix && npm run prettier -- --write && npm run swiftlint -- --fix --format",
+    "eslint": "eslint . --ext ts",
+    "prettier": "prettier \"**/*.{css,html,ts,js,java}\" --plugin=prettier-plugin-java",
+    "swiftlint": "node-swiftlint",
+    "docgen": "docgen --api BackgroundRunnerPlugin --output-readme README.md --output-json dist/docs.json",
+    "docgen-api": "docgen --api CapacitorAPI --output-readme API.md --output-json dist/docs-api.json && node ./scripts/combine_docs.js",
+    "build-sdk": "./scripts/build-native-sdks.sh",
+    "build": "npm run clean && npm run docgen && npm run docgen-api && tsc && rollup -c rollup.config.js --bundleConfigAsCjs && npm run build-sdk && ./scripts/copy-native-sdks.sh && npm pack && mv ./capacitor-background-runner-*.tgz ../../ && ./scripts/copy-readme.sh",
+    "pack": "npm run build && ./scripts/copy-native-sdks.sh && npm pack && mv ./capacitor-background-runner-*.tgz ../../",
+    "clean": "rimraf ./dist",
+    "watch": "tsc --watch",
+    "prepublishOnly": "npm run build",
+    "postinstall": "node ./scripts/install_libs.js"
+  },
+  "devDependencies": {
+    "@capacitor/android": "^8.0.0",
+    "@capacitor/cli": "^8.0.0",
+    "@capacitor/core": "^8.0.0",
+    "@capacitor/docgen": "^0.3.0",
+    "@capacitor/ios": "^8.0.0",
+    "@ionic/eslint-config": "^0.4.0",
+    "@ionic/prettier-config": "^4.0.0",
+    "@ionic/swiftlint-config": "^2.0.0",
+    "eslint": "^8.57.1",
+    "prettier": "^3.6.2",
+    "prettier-plugin-java": "^2.7.7",
+    "rimraf": "^6.1.2",
+    "rollup": "^4.53.3",
+    "swiftlint": "^2.0.0",
+    "typescript": "^5.9.3"
+  },
+  "peerDependencies": {
+    "@capacitor/core": ">=8.0.0"
+  },
+  "prettier": "@ionic/prettier-config",
+  "swiftlint": "@ionic/swiftlint-config",
+  "eslintConfig": {
+    "extends": "@ionic/eslint-config/recommended"
+  },
+  "capacitor": {
+    "ios": {
+      "src": "ios"
+    },
+    "android": {
+      "src": "android"
+    }
+  },
+  "gitHead": "4559cf862ec7575f579a3bc38257efebe552daaf"
+}

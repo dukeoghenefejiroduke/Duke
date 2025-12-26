@@ -1,3 +1,4 @@
+import './App.css';
 import { useEffect, useState } from 'react';
 import { SpeechRecognition } from '@capacitor-community/speech-recognition';
 import { TextToSpeech } from '@capacitor-community/text-to-speech';
@@ -6,16 +7,14 @@ import { Geolocation } from '@capacitor/geolocation';
 import { Contacts } from '@capacitor-community/contacts';
 import { Media } from '@capacitor-community/media';
 import { BluetoothLe } from '@capacitor-community/bluetooth-le';
-import { App } from '@capacitor/app';
+import { App as CapacitorApp } from '@capacitor/app'; // Renamed to avoid conflict
 import { GoogleGenerativeAI } from '@google/generative-ai';
-
-import './App.css';
 
 function App() {
   const [status, setStatus] = useState('Initializing JARVIS...');
 
-  // Replace with your own Gemini API key (free from https://ai.google.dev)
-  const GEMINI_API_KEY = 'YOUR_GEMINI_API_KEY_HERE';
+  // Replace with your own Gemini API key (get it free from https://ai.google.dev)
+  const GEMINI_API_KEY = 'AIzaSyBKQ07Jd8dNw-cfwQ_JQDL15TrjBx6RHeE';
   const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
   const model = genAI.getGenerativeModel({
     model: 'gemini-1.5-flash',
@@ -35,8 +34,8 @@ Respond concisely, with subtle superiority and humor. Use "sir" occasionally. Be
           partialResults: true,
         });
 
-        // Keep listening when app is active
-        App.addListener('appStateChange', ({ isActive }) => {
+        // Restart listening when app becomes active
+        CapacitorApp.addListener('appStateChange', ({ isActive }) => {
           if (isActive) {
             SpeechRecognition.start({ language: 'en-US', partialResults: true });
           }
@@ -102,7 +101,7 @@ Respond concisely, with subtle superiority and humor. Use "sir" occasionally. Be
 
     initJarvis();
 
-    // Holographic particles background
+    // Holographic particles background (requires particles.js library in index.html)
     if (window.particlesJS) {
       window.particlesJS('particles-js', {
         particles: {

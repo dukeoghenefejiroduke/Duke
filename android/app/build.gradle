@@ -1,7 +1,8 @@
 apply plugin: 'com.android.application'
 
 android {
-    namespace "com.duke.jarvis"
+    namespace
+		dirs '../../node_modules/@capacitor/background-runner/android/src/main/libs', 'libs' "com.duke.jarvis"
     compileSdk 36
 
     defaultConfig {
