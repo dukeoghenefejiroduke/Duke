@@ -1,48 +1,12 @@
-// Top-level build file where you can add configuration options common to all sub-projects/modules.
-android {
-    compileSdk 34
-
-    defaultConfig {
-        applicationId "com.duke.jarvis"
-        minSdk 21
-        targetSdk 34
-        versionCode 1
-        versionName "1.0"
-    }
-
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_17
-        targetCompatibility JavaVersion.VERSION_17
-    }
-
-    // Add this toolchain block
-    kotlinOptions {
-        jvmTarget = '17'
-    }
-}
-
-// Add this at the bottom of the file
-java {
-    toolchain {
-        languageVersion = JavaLanguageVersion.of(17)
-    }
-}
 buildscript {
-    
     repositories {
         google()
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:8.13.0'
-        classpath 'com.google.gms:google-services:4.4.4'
-
-        // NOTE: Do not place your application dependencies here; they belong
-        // in the individual module build.gradle files
+        classpath "com.android.tools.build:gradle:8.1.0"
     }
 }
-
-apply from: "variables.gradle"
 
 allprojects {
     repositories {
