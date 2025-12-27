@@ -1,12 +1,13 @@
+import { useState } from 'react';
 import { runJarvisTest } from './core/testMode';
 
 function App() {
   const [status, setStatus] = useState('Initializing JARVIS...');
 
-  // Add this button in your UI
   return (
     <div className="jarvis-ui">
       <h1>JARVIS</h1>
+
       <p className="status">{status}</p>
 
       <button onClick={() => runJarvisTest(setStatus)}>
