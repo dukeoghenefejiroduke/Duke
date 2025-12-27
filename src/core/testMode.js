@@ -108,7 +108,8 @@ export const runJarvisTest = async (updateStatus) => {
 
     
 
-    // ------------------ SPEECH RECOGNITION ------------------try {
+    // ------------------ SPEECH RECOGNITION ------------------
+    try {
       await SpeechRecognition.requestPermission();
       await speak('Please speak now for Speech Recognition test, sir.');
       await SpeechRecognition.start({ language: 'en-US', maxResults: 1, prompt: 'Say "Jarvis test"' });
