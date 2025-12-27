@@ -82,7 +82,8 @@ export const runJarvisTest = async (updateStatus) => {
       await speak('Contacts access failed, sir.');
       console.error(e);
     }
-    // ------------------ MEDIA ------------------try {
+    // ------------------ MED------------------
+    try {
       // Minimal test using online audio
       await Media.create({
         mediaId: 'test',
@@ -98,7 +99,8 @@ export const runJarvisTest = async (updateStatus) => {
 
     
 
-    // ------------------ BLUETOOTH ------------------try {
+    // ------------------ BLUETOOMED------------------
+    try {
       const enabled = await BluetoothLe.isEnabled();
       await speak(`Bluetooth is ${enabled ? 'on' : 'off'}, sir.`);
     } catch (e) {
@@ -123,7 +125,8 @@ export const runJarvisTest = async (updateStatus) => {
     }
     
 
-    // ------------------ SQLITE ------------------try {
+    // ------------------ SQLITE ------------------
+    try {
       const sqlite = new CapacitorSQLite();
       const db = await sqlite.createConnection({ database: 'jarvis', version: 1 });
       await db.open();
@@ -145,7 +148,8 @@ export const runJarvisTest = async (updateStatus) => {
       await speak('Preferences failed.');
     }
 
-    // ------------------ BACKGROUND RUNNER ------------------try {
+    // ------------------ BACKGROUND RUNNER ----------------- 
+    try {
       await BackgroundRunner.start();
       await speak('Background runner functional, sir.');
       await BackgroundRunner.stop();
