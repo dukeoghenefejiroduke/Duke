@@ -73,64 +73,67 @@ export const runJarvisTest = async (updateStatus) => {
     }
 
     // ------------------ CONTACTS ------------------
-    try {
-      const perm = await Contacts.checkPermissions();
-      if (perm.contacts !== 'granted') {
-        await Contacts.requestPermissions();
-      }
-
-      const contacts = await Contacts.getContacts({ pageSize: 1 });
-      if (contacts.contacts.length > 0) {
-        await speak('Contacts access confirmed.');
-      } else {
-        await speak('Contacts list is empty.');
-      }
-    } catch {
-      await speak('Contacts test failed.');
+       try {
+       await Contacts.requestPermissions();
+      const result = await Contacts.getContacts({ pageSize: 1 });
+      if (result.contacts?.length > 0) await speak('Contacts access working, sir.');
+      else await speak('Contacts list empty, sir.');
+    } catch (e) {
+      await speak('Contacts access failed, sir.');
+      console.error(e);
     }
-
-    // ------------------ MEDIA ------------------
-    try {
-      await Media.play();
-      await speak('Media playback working.');
-      await Media.pause();
-    } catch {
-      await speak('Media plugin failed.');
-    }
-
-    // ------------------ BLUETOOTH ------------------
-    try {
-      const enabled = await BluetoothLe.isEnabled();
-      await speak(`Bluetooth is ${enabled ? 'enabled' : 'disabled'}.`);
-    } catch {
-      await speak('Bluetooth check failed.');
-    }
-
-    // ------------------ SPEECH RECOGNITION ------------------
-    try {
-      const perm = await SpeechRecognition.requestPermission();
-      if (perm.granted) {
-        await speak('Speech recognition permission granted.');
-      } else {
-        await speak('Speech recognition permission denied.');
-      }
-    } catch {
-      await speak('Speech recognition failed.');
-    }
-
-    // ------------------ SQLITE ------------------
-    try {
-      const db = await CapacitorSQLite.createConnection({
-        database: 'jarvis_test',
-        version: 1,
+    // ------------------ MEDIA ------------------try {
+      // Minimal test using online audio
+      await Media.create({
+        mediaId: 'test',
+        src: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3'
       });
-      await db.open();
-      await db.execute(`CREATE TABLE IF NOT EXISTS test (id INTEGER PRIMARY KEY);`);
-      await speak('SQLite database operational.');
-      await db.close();
-    } catch {
-      await speak('SQLite failed.');
+      await Media.play({ mediaId: 'test' });
+      await speak('Media plugin working, sir.');
+      await Media.pause({ mediaId: 'test' });
+    } catch (e) {
+      await speak('Media plugin failed, sir.');
+      console.error(e);
     }
+
+    
+
+    // ------------------ BLUETOOTH ------------------try {
+      const enabled = await BluetoothLe.isEnabled();
+      await speak(`Bluetooth is ${enabled ? 'on' : 'off'}, sir.`);
+    } catch (e) {
+      await speak('Bluetooth check failed, sir.');
+      console.error(e);
+    }
+
+    
+
+    // ------------------ SPEECH RECOGNITION ------------------try {
+      await SpeechRecognition.requestPermission();
+      await speak('Please speak now for Speech Recognition test, sir.');
+      await SpeechRecognition.start({ language: 'en-US', maxResults: 1, prompt: 'Say "Jarvis test"' });
+      SpeechRecognition.addListener('partialResults', (event) => {
+        const transcript = event.value?.[0] || '';
+        if (transcript) speak(`Heard: ${transcript}, sir.`);
+      });
+    } catch (e) {
+      await speak('Speech recognition failed, sir.');
+      console.error(e);
+    }
+    
+
+    // ------------------ SQLITE ------------------try {
+      const sqlite = new CapacitorSQLite();
+      const db = await sqlite.createConnection({ database: 'jarvis', version: 1 });
+      await db.open();
+      await db.execute('CREATE TABLE IF NOT EXISTS test(id INTEGER PRIMARY KEY, name TEXT)');
+      await db.close();
+      await speak('SQLite plugin working, sir.');
+    } catch (e) {
+      await speak('SQLite plugin failed, sir.');
+      console.error(e);
+    }
+    
 
     // ------------------ PREFERENCES ------------------
     try {
@@ -141,14 +144,15 @@ export const runJarvisTest = async (updateStatus) => {
       await speak('Preferences failed.');
     }
 
-    // ------------------ BACKGROUND RUNNER ------------------
-    try {
+    // ------------------ BACKGROUND RUNNER ------------------try {
       await BackgroundRunner.start();
-      await speak('Background runner active.');
+      await speak('Background runner functional, sir.');
       await BackgroundRunner.stop();
-    } catch {
-      await speak('Background runner failed.');
+    } catch (e) {
+      await speak('Background runner failed, sir.');
+      console.error(e);
     }
+    
 
     // ------------------ APP INFO ------------------
     try {
