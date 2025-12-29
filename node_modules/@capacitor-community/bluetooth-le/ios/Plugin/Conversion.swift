@@ -15,19 +15,52 @@ func descriptorValueToString(_ value: Any) -> String {
     return ""
 }
 
-func dataToString(_ data: Data) -> String {
-    var valueString = ""
-    for byte in data {
-        valueString += String(format: "%02hhx ", byte)
+extension Data {
+    func toHexString() -> String {
+        let hexChars = Array("0123456789abcdef".utf8)
+        if #available(iOS 14, *) {
+            return String(unsafeUninitializedCapacity: self.count*2) { (ptr) -> Int in
+                var strp = ptr.baseAddress!
+                for byte in self {
+                    strp[0] = hexChars[Int(byte >> 4)]
+                    strp[1] = hexChars[Int(byte & 0xF)]
+                    strp += 2
+                }
+                return 2 * self.count
+            }
+        } else {
+            // Fallback implementation for iOS < 14, a bit slower
+            var result = ""
+            result.reserveCapacity(self.count * 2)
+            for byte in self {
+                let high = Int(byte >> 4)
+                let low  = Int(byte & 0xF)
+                result.append(Character(UnicodeScalar(hexChars[high])))
+                result.append(Character(UnicodeScalar(hexChars[low])))
+            }
+            return result
+        }
     }
-    return valueString
+}
+
+func dataToString(_ data: Data) -> String {
+    return data.toHexString()
 }
 
 func stringToData(_ dataString: String) -> Data {
-    let hexValues = dataString.split(separator: " ")
-    var data = Data(capacity: hexValues.count)
-    for hex in hexValues {
-        data.append(UInt8(hex, radix: 16)!)
+    guard dataString.count % 2 == 0 else {
+        fatalError("Input string must have an even length, not \(dataString.count)")
+    }
+    var data = Data(capacity: dataString.count / 2)
+    for i in stride(from: 0, to: dataString.count, by: 2) {
+        let start = dataString.index(dataString.startIndex, offsetBy: i)
+        let end = dataString.index(start, offsetBy: 2)
+        let hexPair = dataString[start..<end]
+        if let byte = UInt8(hexPair, radix: 16) {
+            data.append(byte)
+        } else {
+            fatalError("Invalid hexadecimal value: \(hexPair)")
+        }
     }
     return data
 }

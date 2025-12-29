@@ -9,12 +9,12 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@capacitor-community/bluetooth-le": "^3.1.4",
-    "@capacitor-community/contacts": "^5.1.1",
-    "@capacitor-community/media": "^5.4.1",
-    "@capacitor-community/speech-recognition": "^5.1.0",
-    "@capacitor-community/sqlite": "^5.7.4",
-    "@capacitor-community/text-to-speech": "^5.1.0",
+    "@capacitor-community/bluetooth-le": "^7.3.0",
+    "@capacitor-community/contacts": "^7.1.0",
+    "@capacitor-community/media": "^8.0.1",
+    "@capacitor-community/speech-recognition": "^7.0.1",
+    "@capacitor-community/sqlite": "^7.0.2",
+    "@capacitor-community/text-to-speech": "^6.1.0",
     "@capacitor/app": "^8.0.0",
     "@capacitor/background-runner": "^3.0.0",
     "@capacitor/camera": "^8.0.0",
